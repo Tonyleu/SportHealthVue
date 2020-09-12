@@ -5,6 +5,10 @@ import VueRouter from 'vue-router'
 import Login from '../components/Login.vue'
 // 引入Home组件
 import Home from '../components/Home.vue'
+// 引入Welcome组件
+import Welcome from '../components/Welcome.vue'
+// 引入User组件
+import User from '../components/admin/User.vue'
 
 Vue.use(VueRouter)
 
@@ -16,12 +20,17 @@ Vue.use(VueRouter)
   {
     path: '/login',
     // name: 'Login',
-    component: Login
+    component: Login,
   },
   {
     path: '/home',
     // name: 'Home',
-    component: Home
+    component: Home,
+    redirect: '/welcome',
+    children: [
+      {path: '/welcome',component: Welcome,},
+      {path: '/user',component: User,},
+    ],
     // path: '/login',
     // name: 'Login',
     // component: Login

@@ -13,8 +13,17 @@
     <!-- 主体 -->
     <el-container>
       <!-- 侧边栏 -->
-      <el-aside width="200px">
-        <el-menu background-color="#545c64" text-color="#fff" active-text-color="#409eff">
+      <el-aside :width="isCollapse?'64px':'200px'">
+        <div class="toggle-button" @click="toggleCollapse">|||</div>
+        <el-menu 
+        text-color="#fff" 
+        background-color="#545c64" 
+        active-text-color="#409eff" 
+        unique-opened="true" 
+        :router="true" 
+        :collapse="isCollapse" 
+        :collapse-transition="false" 
+        :default-active="activePath">
           <!-- 一级菜单 -->
           <el-submenu :index="items.id+''" v-for="items in menuList" :key="items.id">
             <template slot="title">
@@ -22,7 +31,7 @@
               <span>{{items.title}}</span>
             </template>
             <!-- 二级菜单 -->
-            <el-menu-item :index="item.id+''" v-for="item in items.subMenuList" :key="item.id">
+            <el-menu-item :index="item.path" v-for="item in items.subMenuList" :key="item.id" @click="saveNavState(item.path)">
               <template slot="title">
               <i class="el-icon-location"></i>
               <span>{{item.title}}</span>
@@ -32,7 +41,9 @@
         </el-menu>
       </el-aside>
       <!-- 主题内容 -->
-      <el-main>Main</el-main>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -42,18 +53,26 @@ export default {
   data() {
     return {
       // 菜单列表
-      menuList:[],
+      menuList: [],
+      // 伸缩
+      isCollapse: false,
+      // 默认路径
+      activePath: '',
     }
   },
   created() {
       // 查询menuList
       this.getMenuList();
+      // 取出session中的path 动态修改activePath
+      this.activePath = window.sessionStorage.getItem("activePath");
   },
   methods: {
     // 安全退出
     logout() {
-      window.sessionStorage.clear(); // 清楚session
-      this.$router.push("/login"); // 回到首页
+      // 清除session
+      window.sessionStorage.clear();
+      // 回到首页
+      this.$router.push("/login");
     },
     // 获取导航菜单
     async getMenuList() {
@@ -61,6 +80,16 @@ export default {
       console.log(res);
       if (res.flag != 200) return this.$message.error("获取列表失败！！");// 访问失败的错误信息
       this.menuList = res.menus;// 数据回填
+    },
+    // 控制伸缩
+    toggleCollapse() {
+      this.isCollapse = !this.isCollapse;
+    },
+    // 保存路径
+    saveNavState(val) {
+      // activePath保存在session中
+      window.sessionStorage.setItem("activePath",val); 
+      this.activePath = val;
     },
   },
 };
@@ -77,6 +106,7 @@ export default {
   display: flex;
   justify-content: space-between; // 左右贴边
   padding-left: 0%; // 左边界
+  align-items: center;
   color: #fff;
   font-size: 20px;
   div {
@@ -102,5 +132,14 @@ export default {
 img {
   width: 55px;
   height: 55px;
+}
+.toggle-button {
+  background-color: #4a5064;
+  font-size: 10px;
+  line-height: 24px;
+  color: #fff;
+  text-align: center;
+  letter-spacing: 0.2em;
+  cursor: pointer; // 显示小手
 }
 </style>
