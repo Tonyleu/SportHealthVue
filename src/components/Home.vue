@@ -19,7 +19,7 @@
         text-color="#fff" 
         background-color="#545c64" 
         active-text-color="#409eff" 
-        unique-opened="true" 
+        unique-opened  
         :router="true" 
         :collapse="isCollapse" 
         :collapse-transition="false" 
